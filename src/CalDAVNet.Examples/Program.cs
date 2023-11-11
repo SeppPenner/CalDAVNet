@@ -20,13 +20,13 @@ public class Program
     public static async Task Main()
     {
         // Create client.
-        var calDavClient = new Client("http://192.168.2.205", "test", "password");
+        var calDavClient = new Client("http://192.168.2.2/caldav.php/user/someid", "user", "password");
 
         // Get all calendars for the user.
         var calendars = await calDavClient.GetAllCalendars();
 
         // Get the calendar by the uid.
-        var calendarByUid = await calDavClient.GetCalendarByUid("test");
+        var calendarByUid = await calDavClient.GetCalendarByUid("/caldav.php/user/uniqueid/");
 
         // Get the default calendar.
         var defaultCalendar = await calDavClient.GetDefaultCalendar();

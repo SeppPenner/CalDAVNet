@@ -100,7 +100,7 @@ public partial class Client
             throw new ArgumentNullException(nameof(uid));
         }
 
-        return this.GetCalendarWithUri($"{this.UserName}/{uid}");
+        return this.GetCalendarWithUri(uid);
     }
 
     /// <summary>
