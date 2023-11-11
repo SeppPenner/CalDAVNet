@@ -7,10 +7,10 @@ global using System.Text.Json;
 global using System.Text.RegularExpressions;
 global using System.Xml.Linq;
 
-global using CalDAV.NET.Constants;
-global using CalDAV.NET.Extensions;
-global using CalDAV.NET.Model;
-global using CalDAV.NET.Model.Public;
+global using CalDAVNet.Constants;
+global using CalDAVNet.Extensions;
+global using CalDAVNet.Model;
+global using CalDAVNet.Model.Public;
 
 global using Ical.Net.CalendarComponents;
 global using Ical.Net.Serialization;
