@@ -53,6 +53,19 @@ public partial class Client
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="Client"/> class.
+    /// </summary>
+    /// <param name="uri">The uri.</param>
+    /// <param name="password">The password.</param>
+    /// <param name="userName">The user name.</param>
+    public Client(string uri, string userName, string password)
+    {
+        this.Uri = new Uri(uri);
+        this.UserName = userName;
+        this.client = new CalDAVClient(this.Uri, userName, password);
+    }
+
+    /// <summary>
     /// Gets the user name to authenticate with.
     /// </summary>
     public string UserName { get; } = string.Empty;

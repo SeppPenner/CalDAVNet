@@ -34,7 +34,7 @@ public partial class Client
     /// Gets all calendars available for the current user (or none if unauthenticated).
     /// </summary>
     /// <returns>A <see cref="IEnumerable{T}"/> of <see cref="Calendar"/>s.</returns>
-    public async Task<IEnumerable<Calendar>> GetCalendars()
+    public async Task<IEnumerable<Calendar>> GetAllCalendars()
     {
         // Get the user uri.
         var userUri = await this.GetUserUri();
