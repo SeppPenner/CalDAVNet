@@ -18,6 +18,7 @@ CalDAVNet is a project to access CalDAV servers and a fork of https://github.com
 
 ## Available for
 * Net 7.0
+* Net8.0
 
 ## Net Core and Net Framework latest and LTS versions
 * https://dotnet.microsoft.com/download/dotnet
