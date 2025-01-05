@@ -11,7 +11,7 @@ CalDAVNet is a project to access CalDAV servers and a fork of https://github.com
 [![Nuget](https://img.shields.io/badge/CalDAVNet-Nuget-brightgreen.svg)](https://www.nuget.org/packages/HaemmerElectronics.SeppPenner.CalDAVNet/)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/HaemmerElectronics.SeppPenner.CalDAVNet.svg)](https://www.nuget.org/packages/HaemmerElectronics.SeppPenner.CalDAVNet/)
 [![Known Vulnerabilities](https://snyk.io/test/github/SeppPenner/CalDAVNet/badge.svg)](https://snyk.io/test/github/SeppPenner/CalDAVNet)
-[![Gitter](https://badges.gitter.im/CalDAVNet/community.svg)](https://gitter.im/CalDAVNet/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Gitter](https://img.shields.io/matrix/CalDAVNet%3Agitter.im?server_fqdn=matrix.org)](https://matrix.to/#/#CalDAVNet:gitter.im)
 [![Blogger](https://img.shields.io/badge/Follow_me_on-blogger-orange)](https://franzhuber23.blogspot.de/)
 [![Patreon](https://img.shields.io/badge/Patreon-F96854?logo=patreon&logoColor=white)](https://patreon.com/SeppPennerOpenSourceDevelopment)
 [![PayPal](https://img.shields.io/badge/PayPal-00457C?logo=paypal&logoColor=white)](https://paypal.me/th070795)
