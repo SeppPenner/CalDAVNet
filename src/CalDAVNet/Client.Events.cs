@@ -73,6 +73,9 @@ public partial class Client
     {
         calendar.Events.Clear();
         calendar.Events.Add(calendarEvent);
-        return calendarSerializer.SerializeToString(calendar);
+
+        // Ical.Net returns a nullable string since version 5.0.0, an unserializable calendar
+        // must not turn into a null body.
+        return calendarSerializer.SerializeToString(calendar) ?? string.Empty;
     }
 }

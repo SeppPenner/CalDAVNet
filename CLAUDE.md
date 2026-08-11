@@ -54,7 +54,7 @@ Repository root: `README.md` (the only user documentation, with the usage sample
 dotnet build src/CalDAVNet.sln
 ```
 
-- The library multi targets `net8.0;net9.0`, the example project is `net9.0` only. Nothing in the
+- The library multi targets `net8.0;net10.0`, the example project is `net10.0` only. Nothing in the
   code is Windows specific, the two batch files are.
 - All build properties live directly in the two `.csproj` files. There is **no**
   `Directory.Build.props` in this repository, unlike the sibling repository
@@ -65,7 +65,10 @@ dotnet build src/CalDAVNet.sln
   warnings (`NU****`) from restore and pack included. A clean build reports zero warnings, keep it
   that way.
 - `NU1803` (HTTP source usage during restore) is the one warning suppressed via `NoWarn`. Fix
-  warnings instead of extending that list.
+  warnings instead of extending that list. `NuGetAudit` and `NuGetAuditMode=all` are on in the
+  library project, so a vulnerable transitive package fails the build too.
+- `GenerateDocumentationFile` is on in the library project, so the package ships `CalDAVNet.xml`
+  next to the assembly and a wrong `<param>` name is a build error.
 - Versions come from GitVersion.MsBuild out of the git tags, for example `1.0.4-3` for the third
   commit after tag `1.0.3`. Never edit a version property or an assembly version by hand.
 - Restore needs nuget.org. If a private feed is configured globally on the machine and answers 404
@@ -124,9 +127,9 @@ Do not silently "clean up" these, they are existing behaviour:
 - **The example prints nothing.** `Program.Main` assigns every result to a local variable and never
   uses it. Judge a run by the requests that go out, not by stdout. The address
   `http://192.168.2.2/caldav.php/user/someid` is a placeholder.
-- **`GenerateDocumentationFile` is off**, so the package ships without an XML documentation file and
-  broken `<param>` names never show up as a warning. The doc comments are still mandatory, see the
-  code conventions.
+- **Ical.Net types are part of the public API.** `AddOrUpdateEvent`, `DeleteEvent` and
+  `Calendar.Events` speak `CalendarEvent` and `Ical.Net.Calendar`, so a major version bump of
+  Ical.Net is a breaking change for consumers, not an internal update.
 - **AppVeyor badge without CI in the repository.** `README.md` links an AppVeyor build that is
   configured outside of this repository. There is no `.github` folder and no pipeline file here.
 - **`.gitattributes` sets `* text=auto`** and every rule of the Visual Studio template below it is
