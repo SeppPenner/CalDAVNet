@@ -26,10 +26,10 @@ internal class Request<T> where T : Response, new()
     private readonly HttpRequestMessage requestMessage = new();
 
     /// <summary>
-    /// Initializes a new instance of the 
+    /// Initializes a new instance of the <see cref="Request{T}"/> class.
     /// </summary>
-    /// <param name="uri"></param>
-    /// <param name="client"></param>
+    /// <param name="uri">The uri.</param>
+    /// <param name="client">The HTTP client.</param>
     public Request(Uri uri, HttpClient client)
     {
         this.requestMessage.RequestUri = uri;
@@ -68,7 +68,7 @@ internal class Request<T> where T : Response, new()
     /// Sends a request message.
     /// </summary>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A response of type <see cref="T"/>.</returns>
+    /// <returns>A response of type <typeparamref name="T"/>.</returns>
     public async Task<T> Send(CancellationToken cancellationToken = default)
     {
         var message = await this.client.SendAsync(this.requestMessage, HttpCompletionOption.ResponseContentRead, cancellationToken).ConfigureAwait(false);
@@ -113,13 +113,14 @@ internal class Request<T> where T : Response, new()
     }
 
     /// <summary>
-    /// Adds a header.
+    /// Adds a header, replacing a header of the same name that is already set.
     /// </summary>
     /// <param name="name">The header name.</param>
-    /// <param name="name">The header value.</param>
+    /// <param name="value">The header value.</param>
     /// <returns>A <see cref="Request{T}"/>.</returns>
     public Request<T> WithHeader(string name, string value)
     {
+        this.Headers.Remove(name);
         this.Headers.Add(name, value);
         return this;
     }

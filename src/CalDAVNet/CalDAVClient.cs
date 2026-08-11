@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Client.cs" company="Hämmer Electronics">
+// <copyright file="CalDAVClient.cs" company="Hämmer Electronics">
 //   Copyright (c) All rights reserved.
 // </copyright>
 // <summary>
@@ -15,7 +15,8 @@ namespace CalDAVNet;
 internal class CalDAVClient
 {
     /// <summary>
-    /// The HTTP client.
+    /// The HTTP client. It is shared by all instances, so nothing that belongs to a single instance
+    /// is ever written to its default headers, everything is set per request instead.
     /// </summary>
     private static readonly HttpClient client = new();
 
@@ -35,6 +36,11 @@ internal class CalDAVClient
     private readonly Uri baseUri;
 
     /// <summary>
+    /// The authentication header of this instance.
+    /// </summary>
+    private readonly AuthenticationHeaderValue authentication;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="CalDAVClient"/>.
     /// </summary>
     /// <param name="baseUri">The base uri.</param>
@@ -43,11 +49,10 @@ internal class CalDAVClient
     public CalDAVClient(Uri baseUri, string userName, string password)
     {
         this.baseUri = baseUri;
-        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Xml));
-        client.DefaultRequestHeaders.Add(HeaderNames.Prefer, HeaderValues.ReturnMinimal);
-        client.DefaultRequestHeaders.Add(HeaderNames.Depth, HeaderValues.One);
-        var value = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{userName}:{password}"));
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(HeaderNames.Basic, value);
+
+        // UTF-8 is used here because the credentials may contain characters outside of ASCII.
+        var value = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{userName}:{password}"));
+        this.authentication = new AuthenticationHeaderValue(HeaderNames.Basic, value);
     }
 
     /// <summary>
@@ -112,13 +117,19 @@ internal class CalDAVClient
     }
 
     /// <summary>
-    /// Creates a request.
+    /// Creates a request with the headers and the credentials of this instance.
     /// </summary>
     /// <typeparam name="T">The type.</typeparam>
     /// <param name="uri">The uri.</param>
     /// <returns>The <see cref="Request{T}"/>.</returns>
     private Request<T> CreateRequest<T>(string uri) where T : Response, new()
     {
-        return new Request<T>(new Uri(this.baseUri, uri), client);
+        var request = new Request<T>(new Uri(this.baseUri, uri), client);
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Xml));
+        request.Headers.Authorization = this.authentication;
+
+        return request
+            .WithHeader(HeaderNames.Prefer, HeaderValues.ReturnMinimal)
+            .WithHeader(HeaderNames.Depth, HeaderValues.One);
     }
 }

@@ -152,7 +152,7 @@ public partial class Client
         }
 
         // Get calendar by uri.
-        return await this.GetCalendarWithUri(resource.Uri); ;
+        return await this.GetCalendarWithUri(resource.Uri);
     }
 
     /// <summary>
@@ -267,7 +267,7 @@ public partial class Client
                     break;
 
                 case ElementNames.GetLastModified:
-                    calendar.LastModified = DateTimeOffset.Parse(property.Value);
+                    calendar.LastModified = DateTimeOffset.Parse(property.Value, CultureInfo.InvariantCulture);
                     break;
 
                 case ElementNames.SyncToken:
@@ -289,9 +289,9 @@ public partial class Client
             }
         }
 
-        calendar.Uid = uri
-            .Replace(calendar.Owner, string.Empty)
-            .Replace("/", string.Empty);
+        // The owner is only cut out if the server sent one, string.Replace throws on an empty value.
+        var uid = string.IsNullOrEmpty(calendar.Owner) ? uri : uri.Replace(calendar.Owner, string.Empty);
+        calendar.Uid = uid.Replace("/", string.Empty);
 
         // Fetch the events.
         var events = await this.GetEvents(uri).ConfigureAwait(false);

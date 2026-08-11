@@ -57,7 +57,10 @@ public partial class Client
     /// <returns>The event url.</returns>
     private string GetEventUrl(CalendarEvent calendarEvent)
     {
-        return $"{this.Uri}/{calendarEvent.Uid}.ics";
+        // The trailing slash is cut off because the uri may or may not carry one and a double
+        // slash in the path is a different resource for most servers.
+        var uri = this.Uri.ToString().TrimEnd('/');
+        return $"{uri}/{calendarEvent.Uid}.ics";
     }
 
     /// <summary>
