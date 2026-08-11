@@ -47,6 +47,11 @@ internal class Request<T> where T : Response, new()
     public HttpRequestHeaders Headers => this.requestMessage.Headers;
 
     /// <summary>
+    /// Gets the uri the request goes to.
+    /// </summary>
+    public Uri? Uri => this.requestMessage.RequestUri;
+
+    /// <summary>
     /// Gets or sets the method.
     /// </summary>
     public HttpMethod Method

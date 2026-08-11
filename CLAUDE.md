@@ -7,13 +7,14 @@ CalDAVNet is a small .NET class library that talks to CalDAV servers over HTTP. 
 [HaemmerElectronics.SeppPenner.CalDAVNet](https://www.nuget.org/packages/HaemmerElectronics.SeppPenner.CalDAVNet/),
 so every change to the public API is a breaking change for consumers.
 
-One solution `src/CalDAVNet.sln` with exactly two projects:
+One solution `src/CalDAVNet.sln` with exactly three projects:
 
 - `src/CalDAVNet/CalDAVNet.csproj`: the library. Assembly, root namespace and folder are all
   `CalDAVNet`, the package id is `HaemmerElectronics.SeppPenner.CalDAVNet`.
 - `src/CalDAVNet.Examples/CalDAVNet.Examples.csproj`: `OutputType` `Exe`, a demo that calls every
   public method of `Client` once against a hard coded server address. It is not packed and it is
   not meant to be run without a CalDAV server.
+- `src/CalDAVNet.Tests/CalDAVNet.Tests.csproj`: MSTest, added in version 1.0.4.0.
 
 Layout inside `src/CalDAVNet`:
 
@@ -42,6 +43,27 @@ The whole public surface is `Client`, `Model.Public.Calendar`, `CalendarEventExt
 
 `src/CalDAVNet.Examples` holds only `Program.cs` and its own `GlobalUsings.cs`.
 
+Layout inside `src/CalDAVNet.Tests`:
+
+- `CalDAVClientTests.cs`: the headers and the credentials that every request carries, that a second
+  client does not take over the requests of the first one, the depth of zero, the uri combination
+  and the HTTP methods.
+- `RequestTests.cs`: the replacing `WithHeader`, the XML content and its missing declaration, and
+  `Send` against a fake handler.
+- `ResourceResponseTests.cs`: the multistatus parsing, the dropped properties of a failed propstat,
+  the inner XML of a property, a body that is no XML, the successful status codes.
+- `XElementExtensionsTests.cs`: the local name lookup, the inner XML, the status code and the
+  description.
+- `ClientTests.cs`, `CalendarEventExtensionsTests.cs`: the two constructors and the argument check,
+  the JSON of an event.
+- `TestDataProvider.cs`: the credentials, the base uri and the multistatus answer both response
+  tests work on. `FakeHttpMessageHandler.cs`: answers with a canned response and remembers the
+  request, no test opens a connection.
+- `GlobalUsings.cs`: all usings of the test project.
+
+The test project reaches the internal types through `<InternalsVisibleTo Include="CalDAVNet.Tests" />`
+in the library csproj, that is where `Request<T>`, `ResourceResponse` and the extensions live.
+
 Repository root: `README.md` (the only user documentation, with the usage sample), `Changelog.md`,
 `Updating.md` (the release steps), `License.txt` (MIT), `Icon.png` (the package icon),
 `Calendar.ico`, `BuildAndPushPackage.bat`, `Delete-BIN-OBJ-Folders.bat`, `.gitattributes` and
@@ -52,6 +74,10 @@ Repository root: `README.md` (the only user documentation, with the usage sample
 
 ```powershell
 dotnet build src/CalDAVNet.sln
+```
+
+```powershell
+dotnet test src/CalDAVNet.sln
 ```
 
 - The library multi targets `net8.0;net10.0`, the example project is `net10.0` only. Nothing in the
@@ -75,9 +101,14 @@ dotnet build src/CalDAVNet.sln
   for public packages, restore fails with `NU1301`. Then build with an explicit source:
   `dotnet build src/CalDAVNet.sln --source https://api.nuget.org/v3/index.json`.
 - `Delete-BIN-OBJ-Folders.bat` deletes all `bin` and `obj` folders below the repository root.
-- **There are no tests in this repository.** Never claim a test run happened. Verification means a
-  clean build, and for anything that touches the wire format, a check against a real CalDAV server
-  or a captured response, because every request path here needs a server to answer.
+- Tests are MSTest, in the single test project `src/CalDAVNet.Tests`, which follows the same package
+  set as the sibling repositories: `Microsoft.NET.Test.Sdk`, `MSTest.TestAdapter`,
+  `MSTest.TestFramework`, `coverlet.collector` and `GitVersion.MsBuild`. `dotnet test` runs 31
+  tests, they need no network: requests are built and inspected without being sent, and the one
+  test that sends uses a fake message handler. Never claim a test run happened without running it.
+- Everything below `GetAllCalendars`, `GetDefaultCalendar` and `AddOrUpdateEvent` needs a server to
+  answer, the tests stop at the request. A change to a request or to the parsing of an answer is
+  verified against a real CalDAV server or a captured response.
 
 ## Code conventions
 
@@ -127,6 +158,10 @@ Do not silently "clean up" these, they are existing behaviour:
 - **The example prints nothing.** `Program.Main` assigns every result to a local variable and never
   uses it. Judge a run by the requests that go out, not by stdout. The address
   `http://192.168.2.2/caldav.php/user/someid` is a placeholder.
+- **`ToJsonString` writes a projection, not the event.** The `CalendarEvent` itself cannot be handed
+  to `JsonSerializer`, its object graph carries a `System.Text.Encoding`, whose `Preamble` the
+  serializer refuses, so the extension writes the fields that describe the event. Up to version
+  1.0.3.0 it passed the event itself and threw an `InvalidOperationException` every single time.
 - **Ical.Net types are part of the public API.** `AddOrUpdateEvent`, `DeleteEvent` and
   `Calendar.Events` speak `CalendarEvent` and `Ical.Net.Calendar`, so a major version bump of
   Ical.Net is a breaking change for consumers, not an internal update.

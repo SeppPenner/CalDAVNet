@@ -13,6 +13,7 @@ global using CalDAVNet.Model;
 global using CalDAVNet.Model.Public;
 
 global using Ical.Net.CalendarComponents;
+global using Ical.Net.DataTypes;
 global using Ical.Net.Serialization;
 
 global using CultureInfo = System.Globalization.CultureInfo;

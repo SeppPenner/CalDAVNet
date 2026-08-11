@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalDAVNet", "CalDAVNet\CalD
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalDAVNet.Examples", "CalDAVNet.Examples\CalDAVNet.Examples.csproj", "{A26B0ED9-9AC4-4EEC-B3E0-B6D7AB44069C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalDAVNet.Tests", "CalDAVNet.Tests\CalDAVNet.Tests.csproj", "{BF0F6140-818B-4F90-90E6-642134409619}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,14 @@ Global
 		{A26B0ED9-9AC4-4EEC-B3E0-B6D7AB44069C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A26B0ED9-9AC4-4EEC-B3E0-B6D7AB44069C}.Release|x64.ActiveCfg = Release|Any CPU
 		{A26B0ED9-9AC4-4EEC-B3E0-B6D7AB44069C}.Release|x64.Build.0 = Release|Any CPU
+		{BF0F6140-818B-4F90-90E6-642134409619}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF0F6140-818B-4F90-90E6-642134409619}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF0F6140-818B-4F90-90E6-642134409619}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BF0F6140-818B-4F90-90E6-642134409619}.Debug|x64.Build.0 = Debug|Any CPU
+		{BF0F6140-818B-4F90-90E6-642134409619}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF0F6140-818B-4F90-90E6-642134409619}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF0F6140-818B-4F90-90E6-642134409619}.Release|x64.ActiveCfg = Release|Any CPU
+		{BF0F6140-818B-4F90-90E6-642134409619}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
