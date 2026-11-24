@@ -234,11 +234,10 @@ a separate request.
 The version in `Changelog.md` and in `PackageReleaseNotes` has four parts (`1.0.4.0`), the tag has
 three (`1.0.4`). An untagged commit produces something like `1.0.4-3`.
 
-nuget.org holds 1.0.0 to 1.0.3. On 2026-11-24 the tag `1.0.4` existed on GitHub, but version
-1.0.4 was neither on nuget.org nor on GitHub Packages, and the commits of that day sit on top of
-the tag. Publishing 1.0.4 means building from a checkout of the tag (a separate worktree), not from
-`master`.
-GitHub Packages held 1.0.1 to 1.0.3, no tag had a GitHub release yet.
+nuget.org and GitHub Packages hold every tagged version from 1.0.0 to 1.1.0, and every tag has a
+GitHub release. Version 1.0.4 was tagged on 2026-08-11 but only published on 2026-11-24, built from a
+checkout of its tag. The missing versions on GitHub Packages and the releases were added on the same
+day.
 
 ## Git
 
