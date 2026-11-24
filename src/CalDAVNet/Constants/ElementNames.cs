@@ -163,4 +163,34 @@ internal static class ElementNames
     /// The creation date element name.
     /// </summary>
     public const string CreationDate = "creationdate";
+
+    /// <summary>
+    /// The calendar home set element name.
+    /// </summary>
+    public const string CalendarHomeSet = "calendar-home-set";
+
+    /// <summary>
+    /// The calendar element name, the marker of a calendar collection inside the resource type.
+    /// </summary>
+    public const string Calendar = "calendar";
+
+    /// <summary>
+    /// The V event element name.
+    /// </summary>
+    public const string VEvent = "VEVENT";
+
+    /// <summary>
+    /// The time range element name.
+    /// </summary>
+    public const string TimeRange = "time-range";
+
+    /// <summary>
+    /// The start attribute name of the time range.
+    /// </summary>
+    public const string Start = "start";
+
+    /// <summary>
+    /// The end attribute name of the time range.
+    /// </summary>
+    public const string End = "end";
 }

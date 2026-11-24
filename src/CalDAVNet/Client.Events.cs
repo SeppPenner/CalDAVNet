@@ -20,6 +20,34 @@ public partial class Client
     private static readonly CalendarSerializer calendarSerializer = new();
 
     /// <summary>
+    /// Gets the events of the calendar at <see cref="Uri"/> that overlap the given time range. Only these events
+    /// are transferred, a <see cref="Calendar"/> from the calendar methods always carries all of its events.
+    /// </summary>
+    /// <param name="start">The inclusive start of the time range.</param>
+    /// <param name="end">The exclusive end of the time range.</param>
+    /// <returns>A <see cref="IEnumerable{T}"/> of <see cref="CalendarEvent"/>s.</returns>
+    /// <exception cref="ArgumentException">Thrown if the end is not after the start.</exception>
+    public Task<IEnumerable<CalendarEvent>> GetEvents(DateTimeOffset start, DateTimeOffset end)
+    {
+        return this.GetEventsInTimeRange(string.Empty, start, end);
+    }
+
+    /// <summary>
+    /// Gets the events of the given calendar that overlap the given time range.
+    /// </summary>
+    /// <param name="calendar">The calendar.</param>
+    /// <param name="start">The inclusive start of the time range.</param>
+    /// <param name="end">The exclusive end of the time range.</param>
+    /// <returns>A <see cref="IEnumerable{T}"/> of <see cref="CalendarEvent"/>s.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if the calendar is <c>null</c>.</exception>
+    /// <exception cref="ArgumentException">Thrown if the end is not after the start.</exception>
+    public Task<IEnumerable<CalendarEvent>> GetEvents(Calendar calendar, DateTimeOffset start, DateTimeOffset end)
+    {
+        ArgumentNullException.ThrowIfNull(calendar);
+        return this.GetEventsInTimeRange(calendar.Uri, start, end);
+    }
+
+    /// <summary>
     /// Deletes an event.
     /// </summary>
     /// <param name="calendarEvent">The calendar event.</param>
@@ -48,6 +76,24 @@ public partial class Client
             .ConfigureAwait(false);
 
         return result.IsSuccessful;
+    }
+
+    /// <summary>
+    /// Gets the events of a calendar that overlap the given time range.
+    /// </summary>
+    /// <param name="uri">The uri of the calendar.</param>
+    /// <param name="start">The inclusive start of the time range.</param>
+    /// <param name="end">The exclusive end of the time range.</param>
+    /// <returns>A <see cref="IEnumerable{T}"/> of <see cref="CalendarEvent"/>s.</returns>
+    /// <exception cref="ArgumentException">Thrown if the end is not after the start.</exception>
+    private Task<IEnumerable<CalendarEvent>> GetEventsInTimeRange(string uri, DateTimeOffset start, DateTimeOffset end)
+    {
+        if (end <= start)
+        {
+            throw new ArgumentException("The end of the time range has to be after its start.", nameof(end));
+        }
+
+        return this.QueryEvents(uri, start, end);
     }
 
     /// <summary>

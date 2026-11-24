@@ -47,11 +47,11 @@ public class ResourceResponseTests
     }
 
     /// <summary>
-    /// Checks whether the value of a property is its inner XML and not its text. The owner is an example, it
-    /// holds a href element, which is why the client strips the tags with a regex afterwards.
+    /// Checks whether the value of a property with child elements is its inner XML and not its text. The owner is
+    /// an example, it holds a href element, which is why the client strips the tags with a regex afterwards.
     /// </summary>
     [TestMethod]
-    public async Task ParseReturnsTheInnerXmlOfAProperty()
+    public async Task ParseReturnsTheInnerXmlOfAPropertyWithChildElements()
     {
         var response = new ResourceResponse();
 
@@ -60,6 +60,35 @@ public class ResourceResponseTests
         var owner = response.Resources.Single().Properties.Single(x => x.Key.LocalName == ElementNames.Owner).Value;
         StringAssert.Contains(owner, "href");
         StringAssert.Contains(owner, "/caldav.php/user/someid/");
+    }
+
+    /// <summary>
+    /// Checks whether the value of a property that only holds text is the decoded text. Calendar data with an
+    /// escaped ampersand used to reach Ical.Net as <c>&amp;amp;</c>, see https://github.com/SeppPenner/CalDAVNet/issues/1.
+    /// </summary>
+    [TestMethod]
+    public async Task ParseReturnsTheDecodedTextOfAPropertyWithoutChildElements()
+    {
+        const string Body = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <D:multistatus xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav">
+              <D:response>
+                <D:href>/caldav.php/user/someid/calendar/event.ics</D:href>
+                <D:propstat>
+                  <D:status>HTTP/1.1 200 OK</D:status>
+                  <D:prop>
+                    <C:calendar-data>SUMMARY:Tom &amp; Jerry &lt;3</C:calendar-data>
+                  </D:prop>
+                </D:propstat>
+              </D:response>
+            </D:multistatus>
+            """;
+        var response = new ResourceResponse();
+
+        await response.Parse(TestDataProvider.GetResponseMessage(HttpStatusCode.MultiStatus, Body));
+
+        var calendarData = response.Resources.Single().Properties.Single(x => x.Key.LocalName == ElementNames.CalendarData).Value;
+        Assert.AreEqual("SUMMARY:Tom & Jerry <3", calendarData);
     }
 
     /// <summary>

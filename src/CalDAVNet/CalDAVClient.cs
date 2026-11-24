@@ -18,7 +18,7 @@ internal class CalDAVClient
     /// The HTTP client. It is shared by all instances, so nothing that belongs to a single instance
     /// is ever written to its default headers, everything is set per request instead.
     /// </summary>
-    private static readonly HttpClient client = new();
+    private static readonly HttpClient sharedClient = new();
 
     /// <summary>
     /// The propfind HTTP method.
@@ -41,14 +41,32 @@ internal class CalDAVClient
     private readonly AuthenticationHeaderValue authentication;
 
     /// <summary>
+    /// The HTTP client the requests of this instance are sent with.
+    /// </summary>
+    private readonly HttpClient client;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="CalDAVClient"/>.
     /// </summary>
     /// <param name="baseUri">The base uri.</param>
     /// <param name="userName">The user name.</param>
     /// <param name="password">The password.</param>
-    public CalDAVClient(Uri baseUri, string userName, string password)
+    public CalDAVClient(Uri baseUri, string userName, string password) : this(baseUri, userName, password, sharedClient)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CalDAVClient"/> with its own HTTP client. The tests use it
+    /// to answer the requests without a server.
+    /// </summary>
+    /// <param name="baseUri">The base uri.</param>
+    /// <param name="userName">The user name.</param>
+    /// <param name="password">The password.</param>
+    /// <param name="client">The HTTP client.</param>
+    internal CalDAVClient(Uri baseUri, string userName, string password, HttpClient client)
     {
         this.baseUri = baseUri;
+        this.client = client;
 
         // UTF-8 is used here because the credentials may contain characters outside of ASCII.
         var value = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{userName}:{password}"));
@@ -124,7 +142,7 @@ internal class CalDAVClient
     /// <returns>The <see cref="Request{T}"/>.</returns>
     private Request<T> CreateRequest<T>(string uri) where T : Response, new()
     {
-        var request = new Request<T>(new Uri(this.baseUri, uri), client);
+        var request = new Request<T>(new Uri(this.baseUri, uri), this.client);
         request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Xml));
         request.Headers.Authorization = this.authentication;
 

@@ -22,7 +22,7 @@ Layout inside `src/CalDAVNet`:
   Client` in three files. `Client.cs` has the constructors and the shared fields,
   `Client.Calendar.cs` the calendar queries (`GetAllCalendars`, `GetCalendarByUid`,
   `GetDefaultCalendar` plus the private helpers), `Client.Events.cs` the event methods
-  (`AddOrUpdateEvent`, `DeleteEvent`). Keep new members in that split.
+  (`GetEvents` for a time range, `AddOrUpdateEvent`, `DeleteEvent`). Keep new members in that split.
 - `CalDAVClient.cs`: internal. Wraps the `HttpClient`, holds the credentials and turns a uri into a
   `Request<T>` for GET, PUT, DELETE, PROPFIND and REPORT.
 - `Model/`: `Request<T>`, `Response`, `ResourceResponse` and `Resource`, all internal. `Request<T>`
@@ -51,14 +51,20 @@ Layout inside `src/CalDAVNet.Tests`:
 - `RequestTests.cs`: the replacing `WithHeader`, the XML content and its missing declaration, and
   `Send` against a fake handler.
 - `ResourceResponseTests.cs`: the multistatus parsing, the dropped properties of a failed propstat,
-  the inner XML of a property, a body that is no XML, the successful status codes.
+  the inner XML of a property with child elements, the decoded text of a property without, a body
+  that is no XML, the successful status codes.
 - `XElementExtensionsTests.cs`: the local name lookup, the inner XML, the status code and the
   description.
 - `ClientTests.cs`, `CalendarEventExtensionsTests.cs`: the two constructors and the argument check,
   the JSON of an event.
+- `ClientServerTests.cs`: the client end to end against two fake servers, one modelled after the SOGo
+  server of issue 1 (calendar home set, no owner, events only for a component filter on `VEVENT`)
+  and one without a calendar home set. The calendar discovery, the default calendar, the decoded
+  calendar data and the time range query of `GetEvents` are pinned there.
 - `TestDataProvider.cs`: the credentials, the base uri and the multistatus answer both response
-  tests work on. `FakeHttpMessageHandler.cs`: answers with a canned response and remembers the
-  request, no test opens a connection.
+  tests work on. `FakeHttpMessageHandler.cs`: answers with a canned response or with the response
+  of an answer function and remembers the requests, no test opens a connection. `Client` and
+  `CalDAVClient` take its `HttpClient` through an internal constructor.
 - `GlobalUsings.cs`: all usings of the test project.
 
 The test project reaches the internal types through `<InternalsVisibleTo Include="CalDAVNet.Tests" />`
@@ -104,11 +110,11 @@ dotnet test src/CalDAVNet.sln
 - `Delete-BIN-OBJ-Folders.bat` deletes all `bin` and `obj` folders below the repository root.
 - Tests are MSTest, in the single test project `src/CalDAVNet.Tests`, which follows the same package
   set as the sibling repositories: `Microsoft.NET.Test.Sdk`, `MSTest.TestAdapter`,
-  `MSTest.TestFramework`, `coverlet.collector` and `GitVersion.MsBuild`. `dotnet test` runs 31
-  tests, they need no network: requests are built and inspected without being sent, and the one
-  test that sends uses a fake message handler. Never claim a test run happened without running it.
-- Everything below `GetAllCalendars`, `GetDefaultCalendar` and `AddOrUpdateEvent` needs a server to
-  answer, the tests stop at the request. A change to a request or to the parsing of an answer is
+  `MSTest.TestFramework`, `coverlet.collector` and `GitVersion.MsBuild`. `dotnet test` runs 38
+  tests, they need no network: requests are built and inspected without being sent, and the tests
+  that send use a fake message handler. Never claim a test run happened without running it.
+- The fake servers in `ClientServerTests.cs` answer what the code under test asks, they are no proof
+  that a real server answers the same. A change to a request or to the parsing of an answer is
   verified against a real CalDAV server or a captured response.
 
 ## Code conventions
@@ -146,8 +152,8 @@ Do not silently "clean up" these, they are existing behaviour:
   `XDocument` with an `XDeclaration("1.0", "UTF-8", null)`, but `XDocument.ToString()` never writes
   a declaration, so the body that goes out starts with the root element. Servers accept that, the
   declaration is dead weight. `DocumentConstants` exists only for it.
-- **`Depth` is a default header.** `CalDAVClient` sets `Depth: 1` for every request, the two calls
-  that need `Depth: 0` override it per request with `WithHeader`. A new request that needs another
+- **`Depth` is a default header.** `CalDAVClient` sets `Depth: 1` for every request, the calls that
+  need `Depth: 0` override it per request with `WithHeader`. A new request that needs another
   depth has to do the same.
 - **Two identical regexes.** `Client.tagRegex` (instance field, from `Client.cs`) and
   `Client.hrefRegex` (static field, from `Client.Calendar.cs`) both compile `<[^>]*(>|$)` and both

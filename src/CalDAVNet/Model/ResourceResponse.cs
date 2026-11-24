@@ -76,7 +76,7 @@ internal class ResourceResponse : Response
                 return statusCode >= 200 && statusCode <= 299;
             })
             .SelectMany(x => x.LocalNameElements(ElementNames.Prop).Elements())
-            .Select(x => new KeyValuePair<XName, string>(x.Name, x.GetInnerXml()))
+            .Select(x => new KeyValuePair<XName, string>(x.Name, GetPropertyValue(x)))
             .ToDictionary(x => x.Key, x => x.Value);
 
         return new Resource
@@ -85,6 +85,19 @@ internal class ResourceResponse : Response
             Status = status,
             Properties = properties
         };
+    }
+
+    /// <summary>
+    /// Gets the value of a property. A property with child elements, such as an owner with its href,
+    /// keeps its inner XML. A property that only holds text gets the decoded text, otherwise an
+    /// escaped character such as <c>&amp;amp;</c> in the calendar data of an event would reach Ical.Net
+    /// as markup.
+    /// </summary>
+    /// <param name="element">The XML element of the property.</param>
+    /// <returns>The value of the property as <see cref="string"/>.</returns>
+    private static string GetPropertyValue(XElement element)
+    {
+        return element.HasElements ? element.GetInnerXml() : element.Value;
     }
 
     /// <summary>

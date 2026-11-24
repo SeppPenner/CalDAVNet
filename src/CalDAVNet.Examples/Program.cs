@@ -31,6 +31,9 @@ public class Program
         // Get the default calendar.
         var defaultCalendar = await calDavClient.GetDefaultCalendar();
 
+        // Get only the events of March 2026 from the calendar the client was created with.
+        var events = await calDavClient.GetEvents(new DateTimeOffset(2026, 3, 1, 0, 0, 0, TimeSpan.Zero), new DateTimeOffset(2026, 4, 1, 0, 0, 0, TimeSpan.Zero));
+
         // Add an event.
         var calendarEvent = new CalendarEvent();
         var added = await calDavClient.AddOrUpdateEvent(calendarEvent, new Ical.Net.Calendar());

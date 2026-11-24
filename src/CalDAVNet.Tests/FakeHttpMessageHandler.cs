@@ -16,9 +16,9 @@ namespace CalDAVNet.Tests;
 internal sealed class FakeHttpMessageHandler : HttpMessageHandler
 {
     /// <summary>
-    /// The response to answer with.
+    /// The function that builds the response out of the request and its body.
     /// </summary>
-    private readonly HttpResponseMessage response;
+    private readonly Func<HttpRequestMessage, string, HttpResponseMessage> answer;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FakeHttpMessageHandler"/> class.
@@ -26,26 +26,45 @@ internal sealed class FakeHttpMessageHandler : HttpMessageHandler
     /// <param name="response">The response to answer with.</param>
     public FakeHttpMessageHandler(HttpResponseMessage response)
     {
-        this.response = response;
+        this.answer = (_, _) => response;
     }
 
     /// <summary>
-    /// Gets the request the handler was called with.
+    /// Initializes a new instance of the <see cref="FakeHttpMessageHandler"/> class that answers every request
+    /// with its own response, the way a server would.
+    /// </summary>
+    /// <param name="answer">The function that builds the response out of the request and its body.</param>
+    public FakeHttpMessageHandler(Func<HttpRequestMessage, string, HttpResponseMessage> answer)
+    {
+        this.answer = answer;
+    }
+
+    /// <summary>
+    /// Gets the request the handler was called with last.
     /// </summary>
     public HttpRequestMessage? SentRequest { get; private set; }
 
+    /// <summary>
+    /// Gets the bodies of all requests the handler was called with, in their order.
+    /// </summary>
+    public List<string> SentBodies { get; } = [];
+
     /// <inheritdoc cref="HttpMessageHandler"/>
     /// <summary>
-    /// Answers the request with the canned response.
+    /// Answers the request with the canned response or the response of the answer function.
     /// </summary>
     /// <param name="request">The request.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The canned <see cref="HttpResponseMessage"/>.</returns>
+    /// <returns>The <see cref="HttpResponseMessage"/>.</returns>
     /// <seealso cref="HttpMessageHandler"/>
-    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
+        var body = request.Content is null ? string.Empty : await request.Content.ReadAsStringAsync(cancellationToken);
         this.SentRequest = request;
-        this.response.RequestMessage = request;
-        return Task.FromResult(this.response);
+        this.SentBodies.Add(body);
+
+        var response = this.answer(request, body);
+        response.RequestMessage = request;
+        return response;
     }
 }

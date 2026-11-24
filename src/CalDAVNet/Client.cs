@@ -66,6 +66,21 @@ public partial class Client
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="Client"/> class with its own HTTP client. The tests use it
+    /// to answer the requests without a server.
+    /// </summary>
+    /// <param name="uri">The uri.</param>
+    /// <param name="userName">The user name.</param>
+    /// <param name="password">The password.</param>
+    /// <param name="httpClient">The HTTP client.</param>
+    internal Client(Uri uri, string userName, string password, HttpClient httpClient)
+    {
+        this.Uri = uri;
+        this.UserName = userName;
+        this.client = new CalDAVClient(uri, userName, password, httpClient);
+    }
+
+    /// <summary>
     /// Gets the user name to authenticate with.
     /// </summary>
     public string UserName { get; } = string.Empty;
