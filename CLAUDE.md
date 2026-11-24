@@ -197,11 +197,10 @@ a separate request.
 9. Publish to nuget.org with `BuildAndPushPackage.bat`, started from the repository root, its first
    line is `cd .\src`. It deletes every `bin` and `obj` below `src`, builds `-c Release` and pushes
    the `.nupkg` and the `.snupkg` to nuget.org with `%NUGET_API_KEY%` and to the NuGet source named
-   `github` with `%GITHUB_API_KEY%`. **Do not run it as it is now:** `ECHO` is on at the four
-   `dotnet nuget push` lines and they carry no leading `@`, so cmd writes each of them to the console
-   after the variable expansion, both API keys included. Prefix those four lines with `@` first, as
-   in the sibling repositories. It ends with `PAUSE`, so it wants a console. Call it with its
-   full path: the Claude Code shell sets `NoDefaultCurrentDirectoryInExePath=1`, so cmd does not
+   `github` with `%GITHUB_API_KEY%`. The four push lines carry a leading `@`, because `ECHO` is on
+   there and cmd would otherwise write each of them to the console after the variable expansion,
+   both API keys included. Do not remove those prefixes. It ends with `PAUSE`, so it wants a
+   console. Call it with its full path: the Claude Code shell sets `NoDefaultCurrentDirectoryInExePath=1`, so cmd does not
    find a bare `BuildAndPushPackage.bat` in the current directory. Because it always rebuilds, it is
    only correct as long as no commit sits on top of the tag. If one does, push the package that was
    built from the tagged state instead, by its file name and not with the wildcard, because
