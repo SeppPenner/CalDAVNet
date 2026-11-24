@@ -80,8 +80,9 @@ dotnet build src/CalDAVNet.sln
 dotnet test src/CalDAVNet.sln
 ```
 
-- The library multi targets `net8.0;net10.0`, the example project is `net10.0` only. Nothing in the
-  code is Windows specific, the two batch files are.
+- The library multi targets `net10.0;net11.0`, the example project and the test project are
+  `net11.0` only, so building needs the .NET 11 SDK. Keep both on the newest framework the library
+  targets. Nothing in the code is Windows specific, the two batch files are.
 - All build properties live directly in the two `.csproj` files. There is **no**
   `Directory.Build.props` in this repository, unlike the sibling repository
   `CSharpLanguageManager`.
